@@ -219,7 +219,7 @@ module.exports = /******/ (() => {
           const body = await res.json();
       
           body.images.every((element) => {
-            if (element && element.name === name && element.type === 'snapshot') {
+            if (element && element.description === name && element.type === 'snapshot') {
               imageId = element.id;
               return false;
             }

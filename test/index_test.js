@@ -455,11 +455,11 @@ test("getting an image id from snapshot", async (t) => {
     app.get('/images', function (req, res) {
       res.status(200).json({
         images: [
-          {id: "23", name: "snapshot1", type: "backup"},
-          {id: "24", name: "snapshot2", type: "system"},
-          {id: "25", name: "snapshot3", type: "snapshot"},
-          {id: "26", name: "snapshot4", type: "snapshot"},
-          {id: "27", name: "snapshot5", type: "snapshot"}
+          {id: "23", description: "", type: "backup"},
+          {id: "24", description: "", type: "system"},
+          {id: "25", description: "snapshot3", type: "snapshot"},
+          {id: "26", description: "snapshot4", type: "snapshot"},
+          {id: "27", description: "snapshot5", type: "snapshot"}
         ]
       });
     });
@@ -500,11 +500,11 @@ test("if a request creates a server on Hetzner Cloud from snapshot", async (t) =
       app.get('/images', function (req, res) {
         res.status(200).json({
           images: [
-            {id: "23", name: "snapshot1", type: "backup"},
-            {id: "24", name: "snapshot2", type: "system"},
-            {id: "25", name: "snapshot3", type: "snapshot"},
-            {id: "26", name: "snapshot4", type: "snapshot"},
-            {id: "27", name: "snapshot5", type: "snapshot"}
+            {id: "23", description: "", type: "backup"},
+            {id: "24", description: "", type: "system"},
+            {id: "25", description: "snapshot3", type: "snapshot"},
+            {id: "26", description: "snapshot4", type: "snapshot"},
+            {id: "27", description: "snapshot5", type: "snapshot"}
           ]
         });
       });

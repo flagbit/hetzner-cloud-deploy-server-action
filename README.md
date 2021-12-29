@@ -42,6 +42,7 @@ jobs:
 ### Notes
 
 - `server-name` MUST NOT contain spaces.
+- `server-location` MUST be set, use e.g. 'nbg1'.
 - If you don't want the server to be deleted after the action has run, add
 `delete-server: false` as an input in your workflow
 - `ssh-key-name`'s value should be the name of the SSH key as recorded in the Hetzner's cloud console (Under Security -> SSH Keys)
@@ -149,6 +150,7 @@ jobs:
         with:
           server-name: "gh-actions-server"
           server-image: "ubuntu-20.04"
+          server-location: "nbg1"
           server-type: "cx11"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
@@ -187,6 +189,7 @@ jobs:
         with:
           server-name: "server"
           server-image: "ubuntu-20.04"
+          server-location: "nbg1"
           server-type: "cx11"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}

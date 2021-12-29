@@ -40,8 +40,12 @@ const config = __webpack_require__(532);
 const options = {
   server: {
     name: core.getInput("server-name"),
-    image: core.getInput("server-image"),
-    type: core.getInput("server-type")
+    // location: core.getInput("server-location"),
+    type: core.getInput("server-type"),
+  },
+  image: {
+    name: core.getInput("image-name"),
+    type: core.getInput("image-type"),
   },
   sshKeyName: core.getInput("ssh-key-name"),
   hcloudToken: core.getInput("hcloud-token"),

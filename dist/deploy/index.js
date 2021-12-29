@@ -83,7 +83,7 @@ module.exports = /******/ (() => {
               body.images.forEach(element => {
                 if(element.name === options.image.name) {
                   imageId = element.id;
-                  break;
+                  return;
                 }
               });
               core.exportVariable("IMAGE_ID", imageId);
@@ -98,8 +98,8 @@ module.exports = /******/ (() => {
               "User-Agent": config.USER_AGENT,
             },
             body: JSON.stringify({
-              name: imageId || options.server.name,
-              image: options.server.image,
+              name: options.server.name,
+              image: imageId || options.image.name,
               // location: options.server.location,
               server_type: options.server.type,
               ssh_keys: [options.sshKeyName],

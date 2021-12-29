@@ -28,7 +28,10 @@ test("if a request creates a server on Hetzner Cloud", async t => {
     server: {
       name: "server",
       type: "cx11",
-      image: "ubuntu-20.04"
+    },
+    image: {
+      type: "",
+      name: "ubuntu-20.04"
     },
     sshKeyName: "abc",
     hcloudToken: "def",
@@ -51,8 +54,10 @@ test("if a request creates a server on Hetzner Cloud", async t => {
             return options.server.name;
           case "server-type":
             return options.server.type;
-          case "server-image":
-            return options.server.image;
+          case "image-name":
+            return options.image.name;
+          case "image-type":
+            return options.image.type;
           case "ssh-key-name":
             return options.sshKeyName;
           case "hcloud-token":
@@ -82,7 +87,10 @@ test("if a server can be deleted in cleanup ", async t => {
     server: {
       name: "server",
       type: "cx11",
-      image: "ubuntu-20.04"
+    },
+    image: {
+      type: "",
+      name: "ubuntu-20.04"
     },
     sshKeyName: "abc",
     hcloudToken: "def",
@@ -114,8 +122,10 @@ test("if a server can be deleted in cleanup ", async t => {
             return options.server.name;
           case "server-type":
             return options.server.type;
-          case "server-image":
-            return options.server.image;
+          case "image-name":
+            return options.image.name;
+          case "image-type":
+            return options.image.type;
           case "ssh-key-name":
             return options.sshKeyName;
           case "hcloud-token":
@@ -140,7 +150,10 @@ test("if a server is kept when delete-server input is set to false", async t => 
     server: {
       name: "server",
       type: "cx11",
-      image: "ubuntu-20.04"
+    },
+    image: {
+      type: "",
+      name: "ubuntu-20.04"
     },
     sshKeyName: "abc",
     hcloudToken: "def",
@@ -168,8 +181,10 @@ test("if a server is kept when delete-server input is set to false", async t => 
             return options.server.name;
           case "server-type":
             return options.server.type;
-          case "server-image":
-            return options.server.image;
+          case "image-name":
+            return options.image.name;
+          case "image-type":
+            return options.image.type;
           case "ssh-key-name":
             return options.sshKeyName;
           case "hcloud-token":

@@ -45,10 +45,10 @@ async function deploy() {
       if (imagesResponse.status === 201) {
         const body = await imagesResponse.json();
 
-        body.images.forEach(element => {
+        body.images.every(element => {
           if(element.name === options.image.name) {
             imageId = element.id;
-            break;
+            return false;
           }
         });
         core.exportVariable("IMAGE_ID", imageId);
@@ -63,8 +63,8 @@ async function deploy() {
         "User-Agent": config.USER_AGENT,
       },
       body: JSON.stringify({
-        name: imageId || options.server.name,
-        image: options.server.image,
+        name: options.server.name,
+        image: imageId || options.image.name,
         // location: options.server.location,
         server_type: options.server.type,
         ssh_keys: [options.sshKeyName]

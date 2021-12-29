@@ -20,9 +20,9 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "gh-actions-server"
-          server-image: "ubuntu-20.04"
           server-location: "nbg1"
           server-type: "cx11"
+          image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
 ```
@@ -150,9 +150,9 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "gh-actions-server"
-          server-image: "ubuntu-20.04"
           server-location: "nbg1"
           server-type: "cx11"
+          image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
       - uses: webfactory/ssh-agent@v0.4.1
@@ -189,9 +189,9 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "server"
-          server-image: "ubuntu-20.04"
           server-location: "nbg1"
           server-type: "cx11"
+          image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
           startup-timeout: 40000

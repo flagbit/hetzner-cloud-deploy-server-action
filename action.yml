@@ -6,12 +6,15 @@ inputs:
     description: "The name your server should be initiated with."
     default: "gh-actions-ci-server"
     required: false
-  server-image:
-    description: "The Operating System image your server should be initiated with."
-    required: true
   server-type:
     description: "The Hetzner server type you want your server to be."
     required: true
+  image-name:
+    description: "The name of the Operating System image your server should be initiated with."
+    required: true
+  image-type:
+    description: "The type (system|snapshot|backup|app) of the Operating System image your server should be initiated with."
+    required: false
   ssh-key-name:
     description: "The ssh key, you want your server to be provisioned with."
     required: true

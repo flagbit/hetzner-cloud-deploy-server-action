@@ -46,6 +46,7 @@ const options = {
   server: {
     name: core.getInput("server-name"),
     image: core.getInput("server-image"),
+    location: core.getInput("server-location"),
     type: core.getInput("server-type")
   },
   sshKeyName: core.getInput("ssh-key-name"),
@@ -66,6 +67,7 @@ async function deploy() {
       body: JSON.stringify({
         name: options.server.name,
         image: options.server.image,
+        location: options.server.location,
         server_type: options.server.type,
         ssh_keys: [options.sshKeyName]
       })

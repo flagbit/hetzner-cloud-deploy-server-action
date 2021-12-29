@@ -5,7 +5,7 @@ const proxyquire = require("proxyquire");
 
 const { assignIP } = require("../lib.js");
 
-test("if a request creates a server on Hetzner Cloud", async t => {
+test("if a request creates a server on Hetzner Cloud", async (t) => {
   const hetznerServerMock = await createWorker(`
     app.get("/", async (req, res) => {
       return res.status(200).send()
@@ -31,11 +31,11 @@ test("if a request creates a server on Hetzner Cloud", async t => {
     },
     image: {
       type: "",
-      name: "ubuntu-20.04"
+      name: "ubuntu-20.04",
     },
     sshKeyName: "abc",
     hcloudToken: "def",
-    timeout: 10000
+    timeout: 10000,
   };
 
   let serverIdSet = false;
@@ -43,10 +43,10 @@ test("if a request creates a server on Hetzner Cloud", async t => {
   const { deploy } = proxyquire("../lib.js", {
     "./config.js": {
       API: `http://localhost:${worker.port}`,
-      DEFAULT_PORT: hetznerServerMock.port
+      DEFAULT_PORT: hetznerServerMock.port,
     },
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "startup-timeout":
             return options.timeout;
@@ -68,11 +68,11 @@ test("if a request creates a server on Hetzner Cloud", async t => {
       },
       setFailed: console.error,
       setOutput: () => {},
-      exportVariable: name => {
+      exportVariable: (name) => {
         if (name === "SERVER_ID") serverIdSet = true;
         if (name === "SERVER_IPV4") serverIPSet = true;
-      }
-    }
+      },
+    },
   });
 
   const res = await deploy();
@@ -82,7 +82,7 @@ test("if a request creates a server on Hetzner Cloud", async t => {
   t.true(serverIPSet);
 });
 
-test("if a server can be deleted in cleanup ", async t => {
+test("if a server can be deleted in cleanup ", async (t) => {
   const options = {
     server: {
       name: "server",
@@ -90,11 +90,11 @@ test("if a server can be deleted in cleanup ", async t => {
     },
     image: {
       type: "",
-      name: "ubuntu-20.04"
+      name: "ubuntu-20.04",
     },
     sshKeyName: "abc",
     hcloudToken: "def",
-    timeout: 10000
+    timeout: 10000,
   };
   const worker = await createWorker(`
     app.delete("/servers/:id", (req, res) => {
@@ -108,10 +108,10 @@ test("if a server can be deleted in cleanup ", async t => {
 
   const { clean } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
+      API: `http://localhost:${worker.port}`,
     },
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "startup-timeout":
             return options.timeout;
@@ -137,15 +137,15 @@ test("if a server can be deleted in cleanup ", async t => {
         }
       },
       setFailed: console.error,
-      setOutput: () => {}
-    }
+      setOutput: () => {},
+    },
   });
   const res = await clean();
   t.assert(res.url.includes("localhost"));
   t.assert(res.status === 200);
 });
 
-test("if a server is kept when delete-server input is set to false", async t => {
+test("if a server is kept when delete-server input is set to false", async (t) => {
   const options = {
     server: {
       name: "server",
@@ -153,11 +153,11 @@ test("if a server is kept when delete-server input is set to false", async t => 
     },
     image: {
       type: "",
-      name: "ubuntu-20.04"
+      name: "ubuntu-20.04",
     },
     sshKeyName: "abc",
     hcloudToken: "def",
-    timeout: 10000
+    timeout: 10000,
   };
   const worker = await createWorker(`
     app.delete("/servers/:id", (req, res) => {
@@ -167,10 +167,10 @@ test("if a server is kept when delete-server input is set to false", async t => 
 
   const { clean } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
+      API: `http://localhost:${worker.port}`,
     },
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "startup-timeout":
             return options.timeout;
@@ -196,19 +196,19 @@ test("if a server is kept when delete-server input is set to false", async t => 
         }
       },
       setFailed: console.error,
-      setOutput: () => {}
-    }
+      setOutput: () => {},
+    },
   });
   const res = await clean();
   t.assert(!res);
 });
 
-test("if assigning an IP fails inputs that are not a number", async t => {
+test("if assigning an IP fails inputs that are not a number", async (t) => {
   const floatingIPId = "hello world";
   const { assignIP } = proxyquire("../lib.js", {
     "cross-fetch": () => t.fail(),
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "floating-ip-id":
             return floatingIPId;
@@ -216,19 +216,19 @@ test("if assigning an IP fails inputs that are not a number", async t => {
             return "mock value";
         }
       },
-      setFailed: () => t.pass()
-    }
+      setFailed: () => t.pass(),
+    },
   });
 
   await assignIP();
 });
 
-test("if non-assigned floating-ip-id stops assigning procedure silently", async t => {
+test("if non-assigned floating-ip-id stops assigning procedure silently", async (t) => {
   const floatingIPId = undefined;
   const { assignIP } = proxyquire("../lib.js", {
     "cross-fetch": () => t.fail(),
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "floating-ip-id":
             return floatingIPId;
@@ -236,22 +236,23 @@ test("if non-assigned floating-ip-id stops assigning procedure silently", async 
             return "mock value";
         }
       },
-      setFailed: () => t.fail()
-    }
+      setFailed: () => t.fail(),
+    },
   });
 
   await assignIP();
   t.pass();
 });
 
-test("if assigning a floating IP to a server is possible", async t => {
+test("if assigning a floating IP to a server is possible", async (t) => {
   const floatingIPId = 1337;
   const floatingIP = "127.0.0.1";
   const SERVER_ID = 1234;
   const hcloudToken = "abc";
   const IPAssignmentTimeout = 10000;
 
-  const worker = await createWorker(`
+  const worker = await createWorker(
+    `
     const actionId = 4321;
     app.post("/floating_ips/:floatingIPId/actions/assign", (req, res) => {
       if (typeof req.body.server === "number") {
@@ -294,19 +295,21 @@ test("if assigning a floating IP to a server is possible", async t => {
         }
       });
     });
-  `, { requestCount: 4 });
+  `,
+    { requestCount: 4 }
+  );
 
   const { assignIP } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
+      API: `http://localhost:${worker.port}`,
     },
     process: {
       env: {
-        SERVER_ID
-      }
+        SERVER_ID,
+      },
     },
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "floating-ip-id":
             return floatingIPId;
@@ -322,15 +325,15 @@ test("if assigning a floating IP to a server is possible", async t => {
       exportVariable: (name, val) => {
         t.assert(name === "SERVER_FLOATING_IPV4");
         t.assert(val === floatingIP);
-      }
-    }
+      },
+    },
   });
 
   const res = await assignIP();
   t.pass();
 });
 
-test("getting the status of assigning a floating IP", async t => {
+test("getting the status of assigning a floating IP", async (t) => {
   const worker = await createWorker(`
     const actionId = 4321;
     app.get("/floating_ips/:floatingIPId/actions/:actionId", (req, res) => {
@@ -344,16 +347,15 @@ test("getting the status of assigning a floating IP", async t => {
   `);
   const { getAssignmentProgress } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
-    }
+      API: `http://localhost:${worker.port}`,
+    },
   });
 
   const status = await getAssignmentProgress(1234, 4321)();
   t.assert(status === "success");
 });
 
-test("getting a floating ip", async t => {
-
+test("getting a floating ip", async (t) => {
   const ip = "127.0.0.1";
   const worker = await createWorker(`
     app.get("/floating_ips/:floatingIPId", (req, res) => {
@@ -366,21 +368,22 @@ test("getting a floating ip", async t => {
   `);
   const { getFloatingIP } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
-    }
+      API: `http://localhost:${worker.port}`,
+    },
   });
 
-  t.assert(await getFloatingIP(1234) === ip);
+  t.assert((await getFloatingIP(1234)) === ip);
 });
 
-test("if appropriate errors are thrown when assigning IP fails", async t => {
+test("if appropriate errors are thrown when assigning IP fails", async (t) => {
   const floatingIPId = 1337;
   const floatingIP = "127.0.0.1";
   const SERVER_ID = 1234;
   const hcloudToken = "abc";
   const IPAssignmentTimeout = 2000;
 
-  const worker = await createWorker(`
+  const worker = await createWorker(
+    `
     const actionId = 4321;
     app.post("/floating_ips/:floatingIPId/actions/assign", (req, res) => {
       if (typeof req.body.server === "number") {
@@ -410,19 +413,21 @@ test("if appropriate errors are thrown when assigning IP fails", async t => {
         }
       });
     });
-  `, { requestCount: 4 });
+  `,
+    { requestCount: 4 }
+  );
 
   const { assignIP } = proxyquire("../lib.js", {
     "./config.js": {
-      API: `http://localhost:${worker.port}`
+      API: `http://localhost:${worker.port}`,
     },
     process: {
       env: {
-        SERVER_ID
-      }
+        SERVER_ID,
+      },
     },
     "@actions/core": {
-      getInput: name => {
+      getInput: (name) => {
         switch (name) {
           case "floating-ip-id":
             return floatingIPId;
@@ -438,9 +443,129 @@ test("if appropriate errors are thrown when assigning IP fails", async t => {
       exportVariable: (name, val) => {
         t.assert(name === "SERVER_FLOATING_IPV4");
         t.assert(val === floatingIP);
-      }
-    }
+      },
+    },
   });
 
   const res = await assignIP();
+});
+
+test("getting an image id from snapshot", async (t) => {
+  const worker = await createWorker(`
+    app.get('/images', function (req, res) {
+      res.status(200).json({
+        images: [
+          {id: "23", name: "snapshot1", type: "backup"},
+          {id: "24", name: "snapshot2", type: "system"},
+          {id: "25", name: "snapshot3", type: "snapshot"},
+          {id: "26", name: "snapshot4", type: "snapshot"},
+          {id: "27", name: "snapshot5", type: "snapshot"}
+        ]
+      });
+    });
+  `,
+    { requestCount: 2 }
+  );
+
+  const { getImageId } = proxyquire("../lib.js", {
+    "./config.js": {
+      API: `http://localhost:${worker.port}`,
+    },
+  });
+
+  let imageId = await getImageId("snapshot3");
+  t.assert(imageId === "25");
+  imageId = await getImageId("snapshot4");
+  t.assert(imageId === "26");
+});
+
+test("if a request creates a server on Hetzner Cloud from snapshot", async (t) => {
+  const hetznerServerMock = await createWorker(`
+      app.get("/", async (req, res) => {
+        return res.status(200).send()
+      });
+    `);
+  const worker = await createWorker(`
+      app.post("/servers", (req, res) => {
+        if (req.body.name &&
+            req.body.server_type &&
+            req.body.image &&
+            req.body.ssh_keys.length > 0) {
+          return res.status(201).send({server: {id: 124, public_net: { ipv4: { ip: "localhost" } }}});
+        } else {
+          return res.status(422).send();
+        }
+      });
+
+      app.get('/images', function (req, res) {
+        res.status(200).json({
+          images: [
+            {id: "23", name: "snapshot1", type: "backup"},
+            {id: "24", name: "snapshot2", type: "system"},
+            {id: "25", name: "snapshot3", type: "snapshot"},
+            {id: "26", name: "snapshot4", type: "snapshot"},
+            {id: "27", name: "snapshot5", type: "snapshot"}
+          ]
+        });
+      });
+    `,
+      { requestCount: 2 }
+    );
+
+  const options = {
+    server: {
+      name: "server",
+      type: "cx11",
+    },
+    image: {
+      type: "snapshot",
+      name: "snapshot3",
+    },
+    sshKeyName: "abc",
+    hcloudToken: "def",
+    timeout: 10000,
+  };
+
+  let serverIdSet = false;
+  let serverIPSet = false;
+  const { deploy } = proxyquire("../lib.js", {
+    "./config.js": {
+      API: `http://localhost:${worker.port}`,
+      DEFAULT_PORT: hetznerServerMock.port,
+    },
+    "@actions/core": {
+      getInput: (name) => {
+        switch (name) {
+          case "startup-timeout":
+            return options.timeout;
+          case "server-name":
+            return options.server.name;
+          case "server-type":
+            return options.server.type;
+          case "image-name":
+            return options.image.name;
+          case "image-type":
+            return options.image.type;
+          case "ssh-key-name":
+            return options.sshKeyName;
+          case "hcloud-token":
+            return options.hcloudToken;
+          default:
+            throw new Error("didn't match possible cases");
+        }
+      },
+      setFailed: console.error,
+      setOutput: () => {},
+      exportVariable: (name) => {
+        if (name === "SERVER_ID") serverIdSet = true;
+        if (name === "SERVER_IPV4") serverIPSet = true;
+      },
+    },
+  });
+
+  const res = await deploy();
+  t.assert(res.url.includes("localhost"));
+  t.assert(res.status === 201);
+  t.true(serverIdSet);
+  t.true(serverIPSet);
 });

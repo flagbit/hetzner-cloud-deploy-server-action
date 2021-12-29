@@ -24,35 +24,12 @@ const options = {
 };
 
 async function deploy() {
-  let imagesResponse;
-  let imageId = null;
+  let imageId;
   let res;
 
   try {
     if (options.image.type === "snapshot") {
-      imagesResponse = await fetch(`${config.API}/images`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${options.hcloudToken}`,
-          "User-Agent": config.USER_AGENT,
-        },
-        body: JSON.stringify({
-          type: "snapshot"
-        }),
-      });
-
-      if (imagesResponse.status === 201) {
-        const body = await imagesResponse.json();
-
-        body.images.every(element => {
-          if(element.name === options.image.name) {
-            imageId = element.id;
-            return false;
-          }
-        });
-        core.exportVariable("IMAGE_ID", imageId);
-      }
+      imageId = await getImageId(options.image.name);
     }
 
     res = await fetch(`${config.API}/servers`, {
@@ -67,7 +44,7 @@ async function deploy() {
         image: imageId || options.image.name,
         // location: options.server.location,
         server_type: options.server.type,
-        ssh_keys: [options.sshKeyName]
+        ssh_keys: [options.sshKeyName],
       }),
     });
   } catch (err) {
@@ -88,7 +65,7 @@ async function deploy() {
         `Trying to connect to server on default port "${config.DEFAULT_PORT}"`
       );
       return isPortReachable(config.DEFAULT_PORT, {
-        host: ipv4
+        host: ipv4,
       });
     };
 
@@ -108,16 +85,12 @@ async function deploy() {
       return res;
     } else {
       core.setFailed(
-        `Waited ${
-          options.timeout
-        }ms for server to come online, but it never came online. Value: "${online}"`
+        `Waited ${options.timeout}ms for server to come online, but it never came online. Value: "${online}"`
       );
     }
   } else {
     core.setFailed(
-      `When sending the request to Hetzner's API, an error occurred "${
-        res.statusText
-      }"`
+      `When sending the request to Hetzner's API, an error occurred "${res.statusText}"`
     );
   }
 }
@@ -137,8 +110,8 @@ async function clean() {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${options.hcloudToken}`,
-        "User-Agent": config.USER_AGENT
-      }
+        "User-Agent": config.USER_AGENT,
+      },
     });
   } catch (err) {
     core.setFailed(err.message);
@@ -149,9 +122,7 @@ async function clean() {
     return res;
   } else {
     core.setFailed(
-      `When sending the request to Hetzner's API, an error occurred "${
-        res.statusText
-      }"`
+      `When sending the request to Hetzner's API, an error occurred "${res.statusText}"`
     );
     return;
   }
@@ -159,9 +130,7 @@ async function clean() {
 
 function getAssignmentProgress(floatingIPId, actionId) {
   return async () => {
-    const URI = `${
-      config.API
-    }/floating_ips/${floatingIPId}/actions/${actionId}`;
+    const URI = `${config.API}/floating_ips/${floatingIPId}/actions/${actionId}`;
 
     let res;
     try {
@@ -170,8 +139,8 @@ function getAssignmentProgress(floatingIPId, actionId) {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${options.hcloudToken}`,
-          "User-Agent": config.USER_AGENT
-        }
+          "User-Agent": config.USER_AGENT,
+        },
       });
     } catch (err) {
       core.setFailed(err.message);
@@ -182,13 +151,48 @@ function getAssignmentProgress(floatingIPId, actionId) {
       return body.action.status;
     } else {
       core.setFailed(
-        `When trying to check on the ip's assignment progress, an error occurred: ${
-          res.status
-        }`
+        `When trying to check on the ip's assignment progress, an error occurred: ${res.status}`
       );
       return;
     }
   };
+}
+
+async function getImageId(name) {
+  const URI = `${config.API}/images`;
+
+  let imageId = null;
+  let res;
+  
+  try {
+    res = await fetch(URI, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${options.hcloudToken}`,
+        "User-Agent": config.USER_AGENT,
+      },
+    });
+
+  } catch (err) {
+    core.setFailed(err.message);
+  }
+
+  if (res.status === 200) {
+    const body = await res.json();
+
+    body.images.every((element) => {
+      if (element && element.name === name && element.type === 'snapshot') {
+        imageId = element.id;
+        return false;
+      }
+      return true;
+    });
+
+    core.exportVariable("IMAGE_ID", imageId);
+    return imageId;
+  }
+  return;
 }
 
 async function getFloatingIP(id) {
@@ -200,8 +204,8 @@ async function getFloatingIP(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${options.hcloudToken}`,
-        "User-Agent": config.USER_AGENT
-      }
+        "User-Agent": config.USER_AGENT,
+      },
     });
   } catch (err) {
     core.setFailed(err.message);
@@ -246,9 +250,9 @@ async function assignIP() {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${options.hcloudToken}`,
-        "User-Agent": config.USER_AGENT
+        "User-Agent": config.USER_AGENT,
       },
-      body: JSON.stringify({ server: SERVER_ID })
+      body: JSON.stringify({ server: SERVER_ID }),
     });
   } catch (err) {
     core.setFailed(err.message);
@@ -299,9 +303,7 @@ async function assignIP() {
     }
   } else {
     core.setFailed(
-      `When assigning a floating ip to the server an error occurred "${
-        res.statusText
-      }"`
+      `When assigning a floating ip to the server an error occurred "${res.statusText}"`
     );
     return;
   }
@@ -312,5 +314,6 @@ module.exports = {
   clean,
   assignIP,
   getAssignmentProgress,
-  getFloatingIP
+  getImageId,
+  getFloatingIP,
 };

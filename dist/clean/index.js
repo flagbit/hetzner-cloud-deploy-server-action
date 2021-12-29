@@ -49,8 +49,14 @@ const options = {
 };
 
 async function deploy() {
+  let imageId = null;
   let res;
+
   try {
+    if (options.image.type === "snapshot") {
+      imageId = await getImageId(options.image.name);
+    }
+
     res = await fetch(`${config.API}/servers`, {
       method: "POST",
       headers: {
@@ -186,6 +192,41 @@ function getAssignmentProgress(floatingIPId, actionId) {
   };
 }
 
+async function getImageId(name) {
+  const URI = `${config.API}/images`;
+  
+  let res;
+  // try {
+    res = await fetch(URI, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${options.hcloudToken}`,
+        "User-Agent": config.USER_AGENT,
+      },
+    });
+
+    // core.info(`XXXXXXX "${imagesResponse}"`);
+
+  // } catch (err) {
+  //   core.setFailed(err.message);
+  // }
+
+  if (res.status === 201) {
+    const body = await res.json();
+
+    body.images.every((element) => {
+      if (element.name === name && element.type === 'snapshot') {
+        imageId = element.id;
+        return false;
+      }
+    });
+    core.exportVariable("IMAGE_ID", imageId);
+    return imageId;
+  }
+  return;
+}
+
 async function getFloatingIP(id) {
   const URI = `${config.API}/floating_ips/${id}`;
 
@@ -307,6 +348,7 @@ module.exports = {
   clean,
   assignIP,
   getAssignmentProgress,
+  getImageId,
   getFloatingIP
 };
 

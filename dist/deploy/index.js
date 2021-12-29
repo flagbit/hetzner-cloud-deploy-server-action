@@ -46,7 +46,7 @@ module.exports = /******/ (() => {
       const options = {
         server: {
           name: core.getInput("server-name"),
-          location: core.getInput("server-location"),
+          // location: core.getInput("server-location"),
           type: core.getInput("server-type"),
         },
         image: {

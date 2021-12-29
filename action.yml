@@ -1,6 +1,6 @@
-name: "TimDaub/hetzner-cloud-deploy-server-action"
+name: "Farbfox/hetzner-cloud-deploy-server-action"
 description: "Deploy a Hetzner Cloud Server from a GitHub Action"
-author: "Tim Daubenschütz"
+author: "Tim Daubenschütz | Michael Schiller"
 inputs:
   server-name:
     description: "The name your server should be initiated with."
@@ -35,9 +35,9 @@ inputs:
     default: 60000
 
 runs:
-  using: 'node12'
-  main: 'dist/deploy/index.js'
-  post: 'dist/clean/index.js'
+  using: "node12"
+  main: "dist/deploy/index.js"
+  post: "dist/clean/index.js"
 
 branding:
   icon: server

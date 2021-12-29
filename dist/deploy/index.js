@@ -59,14 +59,14 @@ module.exports = /******/ (() => {
       };
 
       async function deploy() {
-        let imageId = null;
+        let imageId;
         let res;
 
         try {
           if (options.image.type === "snapshot") {
             imageId = await getImageId(options.image.name);
           }
-
+      
           res = await fetch(`${config.API}/servers`, {
             method: "POST",
             headers: {
@@ -197,39 +197,41 @@ module.exports = /******/ (() => {
 
       async function getImageId(name) {
         const URI = `${config.API}/images`;
-
+      
+        let imageId = null;
         let res;
-        // try {
-        res = await fetch(URI, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${options.hcloudToken}`,
-            "User-Agent": config.USER_AGENT,
-          },
-        });
-
-        // core.info(`XXXXXXX "${imagesResponse}"`);
-
-        // } catch (err) {
-        //   core.setFailed(err.message);
-        // }
-
-        if (res.status === 201) {
+        
+        try {
+          res = await fetch(URI, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${options.hcloudToken}`,
+              "User-Agent": config.USER_AGENT,
+            },
+          });
+      
+        } catch (err) {
+          core.setFailed(err.message);
+        }
+      
+        if (res.status === 200) {
           const body = await res.json();
-
+      
           body.images.every((element) => {
-            if (element.name === name && element.type === "snapshot") {
+            if (element && element.name === name && element.type === 'snapshot') {
               imageId = element.id;
               return false;
             }
+            return true;
           });
+      
           core.exportVariable("IMAGE_ID", imageId);
           return imageId;
         }
         return;
       }
-
+      
       async function getFloatingIP(id) {
         const URI = `${config.API}/floating_ips/${id}`;
 

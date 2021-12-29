@@ -49,7 +49,7 @@ const options = {
 };
 
 async function deploy() {
-  let imageId = null;
+  let imageId;
   let res;
 
   try {
@@ -192,11 +192,14 @@ function getAssignmentProgress(floatingIPId, actionId) {
   };
 }
 
+
 async function getImageId(name) {
   const URI = `${config.API}/images`;
-  
+
+  let imageId = null;
   let res;
-  // try {
+  
+  try {
     res = await fetch(URI, {
       method: "GET",
       headers: {
@@ -206,21 +209,21 @@ async function getImageId(name) {
       },
     });
 
-    // core.info(`XXXXXXX "${imagesResponse}"`);
+  } catch (err) {
+    core.setFailed(err.message);
+  }
 
-  // } catch (err) {
-  //   core.setFailed(err.message);
-  // }
-
-  if (res.status === 201) {
+  if (res.status === 200) {
     const body = await res.json();
 
     body.images.every((element) => {
-      if (element.name === name && element.type === 'snapshot') {
+      if (element && element.name === name && element.type === 'snapshot') {
         imageId = element.id;
         return false;
       }
+      return true;
     });
+
     core.exportVariable("IMAGE_ID", imageId);
     return imageId;
   }

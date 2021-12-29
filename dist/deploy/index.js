@@ -100,7 +100,7 @@ module.exports = /******/ (() => {
             body: JSON.stringify({
               name: imageId || options.server.name,
               image: options.server.image,
-              location: options.server.location,
+              // location: options.server.location,
               server_type: options.server.type,
               ssh_keys: [options.sshKeyName],
             }),

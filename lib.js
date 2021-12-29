@@ -11,32 +11,64 @@ const config = require("./config.js");
 const options = {
   server: {
     name: core.getInput("server-name"),
-    image: core.getInput("server-image"),
     location: core.getInput("server-location"),
-    type: core.getInput("server-type")
+    type: core.getInput("server-type"),
+  },
+  image: {
+    name: core.getInput("image-name"),
+    type: core.getInput("image-type"),
   },
   sshKeyName: core.getInput("ssh-key-name"),
   hcloudToken: core.getInput("hcloud-token"),
-  timeout: core.getInput("startup-timeout")
+  timeout: core.getInput("startup-timeout"),
 };
 
 async function deploy() {
+  let imagesResponse;
+  let imageId = null;
   let res;
+
   try {
+    if (options.image.type === "snapshot") {
+      imagesResponse = await fetch(`${config.API}/images`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${options.hcloudToken}`,
+          "User-Agent": config.USER_AGENT,
+        },
+        body: JSON.stringify({
+          type: "snapshot"
+        }),
+      });
+
+      if (imagesResponse.status === 201) {
+        const body = await imagesResponse.json();
+
+        body.images.forEach(element => {
+          if(element.name === options.image.name) {
+            imageId = element.id;
+            break;
+          }
+        });
+        core.exportVariable("IMAGE_ID", imageId);
+      }
+    }
+
     res = await fetch(`${config.API}/servers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${options.hcloudToken}`,
-        "User-Agent": config.USER_AGENT
+        "User-Agent": config.USER_AGENT,
       },
       body: JSON.stringify({
-        name: options.server.name,
+        name: imageId || options.server.name,
         image: options.server.image,
         location: options.server.location,
         server_type: options.server.type,
         ssh_keys: [options.sshKeyName]
-      })
+      }),
     });
   } catch (err) {
     core.setFailed(err.message);

@@ -21,6 +21,7 @@ jobs:
         with:
           server-name: "gh-actions-server"
           server-image: "ubuntu-20.04"
+          server-location: "nbg1"
           server-type: "cx11"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}

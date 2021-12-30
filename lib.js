@@ -326,5 +326,5 @@ module.exports = {
   assignIP,
   getAssignmentProgress,
   getImageId,
-  getFloatingIP,
+  getFloatingIP
 };

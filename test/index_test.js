@@ -56,7 +56,7 @@ test("if a request creates a server on Hetzner Cloud", async (t) => {
             return options.server.type;
           case "server-location":
             return options.server.location;
-          case "image-name":
+          case "image-identifier":
             return options.image.name;
           case "image-type":
             return options.image.type;
@@ -126,7 +126,7 @@ test("if a server can be deleted in cleanup ", async (t) => {
             return options.server.type;
           case "server-location":
             return options.server.location;
-          case "image-name":
+          case "image-identifier":
             return options.image.name;
           case "image-type":
             return options.image.type;
@@ -187,7 +187,7 @@ test("if a server is kept when delete-server input is set to false", async (t) =
             return options.server.type;
           case "server-location":
             return options.server.location;
-          case "image-name":
+          case "image-identifier":
             return options.image.name;
           case "image-type":
             return options.image.type;
@@ -558,7 +558,7 @@ test("if a request creates a server on Hetzner Cloud from snapshot", async (t) =
             return options.server.type;
           case "server-location":
             return options.server.location;
-          case "image-name":
+          case "image-identifier":
             return options.image.name;
           case "image-type":
             return options.image.type;

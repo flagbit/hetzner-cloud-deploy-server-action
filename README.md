@@ -22,7 +22,7 @@ jobs:
           server-name: "gh-actions-server"
           server-type: "cx11"
           server-location: "nbg1"
-          image-name: "ubuntu-20.04"
+          image-identifier: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
 ```
@@ -152,7 +152,7 @@ jobs:
           server-name: "gh-actions-server"
           server-type: "cx11"
           server-location: "nbg1"
-          image-name: "ubuntu-20.04"
+          image-identifier: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
       - uses: webfactory/ssh-agent@v0.4.1
@@ -191,7 +191,7 @@ jobs:
           server-name: "server"
           server-type: "cx11"
           server-location: "nbg1"
-          image-name: "ubuntu-20.04"
+          image-identifier: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
           startup-timeout: 40000

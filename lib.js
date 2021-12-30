@@ -15,7 +15,7 @@ const options = {
     type: core.getInput("server-type"),
   },
   image: {
-    name: core.getInput("image-name"),
+    name: core.getInput("image-identifier"),
     type: core.getInput("image-type"),
   },
   sshKeyName: core.getInput("ssh-key-name"),

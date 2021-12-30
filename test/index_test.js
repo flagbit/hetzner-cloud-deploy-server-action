@@ -54,6 +54,8 @@ test("if a request creates a server on Hetzner Cloud", async (t) => {
             return options.server.name;
           case "server-type":
             return options.server.type;
+          case "server-location":
+            return options.server.location;
           case "image-name":
             return options.image.name;
           case "image-type":
@@ -122,6 +124,8 @@ test("if a server can be deleted in cleanup ", async (t) => {
             return options.server.name;
           case "server-type":
             return options.server.type;
+          case "server-location":
+            return options.server.location;
           case "image-name":
             return options.image.name;
           case "image-type":
@@ -181,6 +185,8 @@ test("if a server is kept when delete-server input is set to false", async (t) =
             return options.server.name;
           case "server-type":
             return options.server.type;
+          case "server-location":
+            return options.server.location;
           case "image-name":
             return options.image.name;
           case "image-type":
@@ -471,6 +477,14 @@ test("getting an image id from snapshot", async (t) => {
     "./config.js": {
       API: `http://localhost:${worker.port}`,
     },
+    "@actions/core": {
+      getInput: (name) => {
+        switch (name) {
+          case "image-type":
+            return "snapshot";
+        }
+      },
+    },
   });
 
   let imageId = await getImageId("snapshot3");
@@ -542,6 +556,8 @@ test("if a request creates a server on Hetzner Cloud from snapshot", async (t) =
             return options.server.name;
           case "server-type":
             return options.server.type;
+          case "server-location":
+            return options.server.location;
           case "image-name":
             return options.image.name;
           case "image-type":
@@ -569,3 +585,13 @@ test("if a request creates a server on Hetzner Cloud from snapshot", async (t) =
   t.true(serverIdSet);
   t.true(serverIPSet);
 });
+
+// test("try live run", async (t) => {
+// INFO: set options explicitly to use this for live test with hentzner cloud
+//   const { deploy } = proxyquire("../lib.js", {
+//     "./config.js": {
+//     },
+//   });
+//   const res = await deploy();
+//   t.assert(true);
+// });

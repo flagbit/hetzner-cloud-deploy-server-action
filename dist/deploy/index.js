@@ -46,7 +46,7 @@ module.exports = /******/ (() => {
       const options = {
         server: {
           name: core.getInput("server-name"),
-          // location: core.getInput("server-location"),
+          location: core.getInput("server-location"),
           type: core.getInput("server-type"),
         },
         image: {
@@ -66,6 +66,9 @@ module.exports = /******/ (() => {
           if (options.image.type === "snapshot") {
             imageId = await getImageId(options.image.name);
           }
+
+          imageIdentifier = imageId || options.image.name;
+          core.info(`debug imageIdentifier: "${imageIdentifier}"`);
       
           res = await fetch(`${config.API}/servers`, {
             method: "POST",
@@ -76,8 +79,8 @@ module.exports = /******/ (() => {
             },
             body: JSON.stringify({
               name: options.server.name,
-              image: imageId || options.image.name,
-              // location: options.server.location,
+              image: imageIdentifier,
+              location: options.server.location,
               server_type: options.server.type,
               ssh_keys: [options.sshKeyName],
             }),
@@ -196,11 +199,11 @@ module.exports = /******/ (() => {
       }
 
       async function getImageId(name) {
-        const URI = `${config.API}/images`;
-      
+        const URI = `${config.API}/images?type=${options.image.type}&sort=created:desc`;
+
         let imageId = null;
         let res;
-        
+
         try {
           res = await fetch(URI, {
             method: "GET",
@@ -210,53 +213,34 @@ module.exports = /******/ (() => {
               "User-Agent": config.USER_AGENT,
             },
           });
-      
         } catch (err) {
           core.setFailed(err.message);
         }
-      
+
         if (res.status === 200) {
           const body = await res.json();
-      
+
+          core.info(`getImageId image count: "${body.images.length}"`);
+          core.info(`getImageId image name: "${name}"`);
+          core.info(`getImageId image type: "${options.image.type}"`);
+
           body.images.every((element) => {
-            if (element && element.description === name && element.type === 'snapshot') {
+            if (
+              element &&
+              element.description === name &&
+              element.type === options.image.type
+            ) {
               imageId = element.id;
+              core.info(`getImageId imageId: "${imageId}"`);
               return false;
             }
             return true;
           });
-      
+
           core.exportVariable("IMAGE_ID", imageId);
           return imageId;
         }
         return;
-      }
-      
-      async function getFloatingIP(id) {
-        const URI = `${config.API}/floating_ips/${id}`;
-
-        try {
-          res = await fetch(URI, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${options.hcloudToken}`,
-              "User-Agent": config.USER_AGENT,
-            },
-          });
-        } catch (err) {
-          core.setFailed(err.message);
-        }
-
-        if (res.status === 200) {
-          const body = await res.json();
-          return body.floating_ip.ip;
-        } else {
-          core.setFailed(
-            `When trying to get a floating ip, an error occurred ${res.status}`
-          );
-          return;
-        }
       }
 
       async function assignIP() {

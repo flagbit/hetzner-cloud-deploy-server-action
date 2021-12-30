@@ -40,7 +40,7 @@ const config = __webpack_require__(532);
 const options = {
   server: {
     name: core.getInput("server-name"),
-    // location: core.getInput("server-location"),
+    location: core.getInput("server-location"),
     type: core.getInput("server-type"),
   },
   image: {
@@ -61,6 +61,9 @@ async function deploy() {
       imageId = await getImageId(options.image.name);
     }
 
+    imageIdentifier = imageId || options.image.name;
+    core.info(`debug imageIdentifier: "${imageIdentifier}"`);
+
     res = await fetch(`${config.API}/servers`, {
       method: "POST",
       headers: {
@@ -70,9 +73,10 @@ async function deploy() {
       },
       body: JSON.stringify({
         name: options.server.name,
-        image: options.server.image,
+        image: imageIdentifier,
+        location: options.server.location,
         server_type: options.server.type,
-        ssh_keys: [options.sshKeyName]
+        ssh_keys: [options.sshKeyName],
       })
     });
   } catch (err) {
@@ -197,12 +201,13 @@ function getAssignmentProgress(floatingIPId, actionId) {
 }
 
 
+
 async function getImageId(name) {
-  const URI = `${config.API}/images`;
+  const URI = `${config.API}/images?type=${options.image.type}&sort=created:desc`;
 
   let imageId = null;
   let res;
-  
+
   try {
     res = await fetch(URI, {
       method: "GET",
@@ -212,7 +217,6 @@ async function getImageId(name) {
         "User-Agent": config.USER_AGENT,
       },
     });
-
   } catch (err) {
     core.setFailed(err.message);
   }
@@ -220,9 +224,18 @@ async function getImageId(name) {
   if (res.status === 200) {
     const body = await res.json();
 
+    core.info(`getImageId image count: "${body.images.length}"`);
+    core.info(`getImageId image name: "${name}"`);
+    core.info(`getImageId image type: "${options.image.type}"`);
+
     body.images.every((element) => {
-      if (element && element.description === name && element.type === 'snapshot') {
+      if (
+        element &&
+        element.description === name &&
+        element.type === options.image.type
+      ) {
         imageId = element.id;
+        core.info(`getImageId imageId: "${imageId}"`);
         return false;
       }
       return true;

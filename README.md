@@ -20,8 +20,8 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "gh-actions-server"
-          server-location: "nbg1"
           server-type: "cx11"
+          server-location: "nbg1"
           image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
@@ -150,8 +150,8 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "gh-actions-server"
-          server-location: "nbg1"
           server-type: "cx11"
+          server-location: "nbg1"
           image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}
@@ -189,8 +189,8 @@ jobs:
       - uses: TimDaub/hetzner-cloud-deploy-server-action@v2
         with:
           server-name: "server"
-          server-location: "nbg1"
           server-type: "cx11"
+          server-location: "nbg1"
           image-name: "ubuntu-20.04"
           ssh-key-name: "my key name"
           hcloud-token: ${{ secrets.HCLOUD_TOKEN }}

@@ -9,6 +9,9 @@ inputs:
   server-type:
     description: "The Hetzner server type you want your server to be."
     required: true
+  server-location:
+    description: "The Hetzner server location (nbg1|...) you want your server to be."
+    required: true
   image-name:
     description: "The name of the Operating System image your server should be initiated with."
     required: true

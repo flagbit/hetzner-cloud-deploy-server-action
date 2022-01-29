@@ -51,6 +51,7 @@ module.exports = /******/ (() => {
         },
         image: {
           name: core.getInput("image-identifier"),
+          label: core.getInput("image-label"),
           type: core.getInput("image-type"),
         },
         sshKeyName: core.getInput("ssh-key-name"),
@@ -199,11 +200,16 @@ module.exports = /******/ (() => {
       }
 
       async function getImageId(name) {
-        const URI = `${config.API}/images?type=${options.image.type}&sort=created:desc`;
-
         let imageId = null;
         let res;
-
+        let URI;
+      
+        if (!options.image.label || options.image.label.length === 0) {
+          URI = `${config.API}/images?type=${options.image.type}&sort=created:desc`;
+        } else {
+          URI = `${config.API}/images?type=${options.image.type}&label_selector=${options.image.label}&sort=created:desc`;
+        }
+      
         try {
           res = await fetch(URI, {
             method: "GET",

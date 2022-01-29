@@ -58,6 +58,8 @@ test("if a request creates a server on Hetzner Cloud", async (t) => {
             return options.server.location;
           case "image-identifier":
             return options.image.name;
+          case "image-label":
+              return options.image.label;
           case "image-type":
             return options.image.type;
           case "ssh-key-name":
@@ -128,6 +130,8 @@ test("if a server can be deleted in cleanup ", async (t) => {
             return options.server.location;
           case "image-identifier":
             return options.image.name;
+          case "image-label":
+            return options.image.label;
           case "image-type":
             return options.image.type;
           case "ssh-key-name":
@@ -189,6 +193,8 @@ test("if a server is kept when delete-server input is set to false", async (t) =
             return options.server.location;
           case "image-identifier":
             return options.image.name;
+          case "image-label":
+            return options.image.label;
           case "image-type":
             return options.image.type;
           case "ssh-key-name":
@@ -493,6 +499,46 @@ test("getting an image id from snapshot", async (t) => {
   t.assert(imageId === "26");
 });
 
+test("getting an image id from snapshot with label", async (t) => {
+  const worker = await createWorker(`
+    app.get('/images', function (req, res) {
+      res.status(200).json({
+        images: [
+          {id: "23", description: "", type: "backup"},
+          {id: "24", description: "", type: "system"},
+          {id: "25", description: "snapshot3", type: "snapshot"},
+          {id: "26", description: "snapshot4", type: "snapshot"},
+          {id: "27", description: "snapshot5", type: "snapshot", labels: { "GITHUB": ""}},
+          {id: "28", description: "snapshot6", type: "snapshot"}
+        ]
+      });
+    });
+  `,
+    { requestCount: 2 }
+  );
+
+  const { getImageId } = proxyquire("../lib.js", {
+    "./config.js": {
+      API: `http://localhost:${worker.port}`,
+    },
+    "@actions/core": {
+      getInput: (name) => {
+        switch (name) {
+          case "image-label":
+            return "GITHUB";
+          case "image-type":
+            return "snapshot";
+        }
+      },
+    },
+  });
+  
+  imageId = await getImageId("snapshot3");
+  t.assert(imageId === "25");
+  imageId = await getImageId("snapshot5");
+  t.assert(imageId === "27");
+});
+
 test("if a request creates a server on Hetzner Cloud from snapshot", async (t) => {
   const hetznerServerMock = await createWorker(`
       app.get("/", async (req, res) => {
@@ -560,6 +606,8 @@ test("if a request creates a server on Hetzner Cloud from snapshot", async (t) =
             return options.server.location;
           case "image-identifier":
             return options.image.name;
+          case "image-label":
+            return options.image.label;
           case "image-type":
             return options.image.type;
           case "ssh-key-name":

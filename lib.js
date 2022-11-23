@@ -52,6 +52,7 @@ async function deploy() {
       }),
     });
   } catch (err) {
+    core.debug(err);
     core.setFailed(err.message);
   }
 
